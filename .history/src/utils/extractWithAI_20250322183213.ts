@@ -50,7 +50,7 @@ const prompt = `
         - If no stock ticker is found, return "NO_TICKER_FOUND".
         - Only output the ticker(s) separated by commas, with no extra text.
         - If the user explicitly mentions "港股" or "HK" in the query, prioritize the Hong Kong ticker for that stock, even in Global mode.
-        - If the user explicitly mentions "美股" in the query, prioritize the US ticker for that stock, even in Global mode.
+        - If the user explicitly mentions "美股" or "" in the query, prioritize the Hong Kong ticker for that stock, even in Global mode.
 
         Examples:
         Query: "Find me Apple stock price", Market: "US" -> Answer: "AAPL"
