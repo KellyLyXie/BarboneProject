@@ -1,0 +1,123 @@
+// src/utils/ticker.ts
+
+export interface StockItem {
+    symbol: string;
+    name?: string;
+    exchange?: string;
+}
+
+// 获取所有股票代码
+export async function fetchTickers(): Promise<Set<string>> {
+    // 从环境变量中读取 Key
+    const apiKey = process.env.NEXT_PUBLIC_FMP_API_KEY;
+    
+    // 拼接到请求 URL 中
+    const response = await fetch(`https://financialmodelingprep.com/api/v3/stock/list?apikey=${apiKey}`);
+    
+    // 如果响应不成功，抛出或返回空
+    if (!response.ok) {
+      console.error("FMP API Error:", response.status, response.statusText);
+      return new Set();
+    }
+    
+    // 将响应解析为 JSON
+    const data = await response.json();
+    
+    // 如果 data 不是数组，说明 API 可能返回了错误信息
+    if (!Array.isArray(data)) {
+      console.error("FMP returned a non-array:", data);
+      return new Set();
+    }
+    
+    // 将 symbol 转为大写后存入 Set
+    const symbols = data.map((item: any) => item.symbol.toUpperCase());
+    return new Set(symbols);
+  }
+  
+
+
+// export async function extractTicker(query: string, region: string = "US"): Promise<string[]> {
+//     const tickersSet = await fetchTickers();
+//     const words = query.split(/\s+/).map(w => w.trim()).filter(Boolean);
+//     const result: string[] = [];
+  
+//     for (const word of words) {
+//       const upperWord = word.toUpperCase();
+//       if (tickersSet.has(upperWord)) {
+//         result.push(upperWord);
+//       } else {
+//         // 传入 region 参数到 searchStocks
+//         const searchResult = await searchStocks(word, region);
+//         if (searchResult.length > 0) {
+//           result.push(searchResult[0].symbol.toUpperCase());
+//         }
+//       }
+//     }
+//     return result;
+//   }
+
+export async function extractTicker(query: string, region: string = "US"): Promise<string[]> {
+    // 去掉两边空格
+    const trimmedQuery = query.trim();
+    if (!trimmedQuery) return [];
+  
+    // 如果输入中没有空格，则认为是单个单词
+    if (!trimmedQuery.includes(" ")) {
+      // 先尝试严格匹配：获取所有股票代码集合
+      const tickersSet = await fetchTickers();
+      const upperQuery = trimmedQuery.toUpperCase();
+      if (tickersSet.has(upperQuery)) {
+        // 如果直接匹配到了，就返回该 ticker
+        return [upperQuery];
+      } else {
+        // 否则调用搜索接口
+        const searchResult = await searchStocks(trimmedQuery, region);
+        if (searchResult.length > 0) {
+          return [searchResult[0].symbol.toUpperCase()];
+        }
+        return [];
+      }
+    } else {
+      // 如果包含多个单词，则将整个输入作为短语来搜索
+      const searchResult = await searchStocks(trimmedQuery, region);
+      if (searchResult.length > 0) {
+        // 这里简单地取第一个搜索结果的 ticker
+        return [searchResult[0].symbol.toUpperCase()];
+      }
+      return [];
+    }
+  }
+
+export async function searchStocks(query: string, region: string = "US"): Promise<StockItem[]> {
+    const apiKey = process.env.NEXT_PUBLIC_FMP_API_KEY;
+  
+    // 根据区域设置交易所参数
+    let exchangeParam = "";
+    if (region === "US") {
+      exchangeParam = "&exchange=NASDAQ"; // 或者同时支持 NYSE，如 &exchange=NASDAQ&exchange=NYSE，根据文档要求可能需要调整
+    } else if (region === "HK") {
+      exchangeParam = "&exchange=HKEX";
+    } else if (region === "CN") {
+      exchangeParam = "&exchange=SSE"; // 或 SZSE
+    }
+    // 对于 Global，则不附加交易所筛选
+  
+    const url = `https://financialmodelingprep.com/api/v3/search?query=${encodeURIComponent(query)}&limit=10${exchangeParam}&apikey=${apiKey}`;
+    console.log("Search URL:", url); // 打印 URL 检查是否正确
+  
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.error("FMP Search API Error:", response.status, response.statusText);
+      return [];
+    }
+    const data = await response.json();
+    if (!Array.isArray(data)) {
+      console.error("FMP Search API returned non-array:", data);
+      return [];
+    }
+    return data.map((item: any) => ({
+      symbol: item.symbol,
+      name: item.name,
+      exchange: item.exchange,
+    }));
+  }

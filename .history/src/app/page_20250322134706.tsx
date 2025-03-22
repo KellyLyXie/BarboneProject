@@ -1,0 +1,91 @@
+
+"use client";
+
+import { useState } from "react";
+import SearchBar from "../components/SearchBar";
+import { extractTicker } from "@/utils/ticker";
+
+export default function Home() {
+  const [output, setOutput] = useState("");
+  const [tickers, setTickers] = useState<string[]>([]);
+
+  const handleSearch = async (query: string, lang: string, region: string) => {
+    console.log(`Query: ${query}, Language: ${lang}, Region: ${region}`);
+
+    // 调用改造后的 extractTicker
+    const extracted = await extractTicker(query);
+
+    if (extracted.length > 0) {
+      setTickers(extracted);
+      setOutput(`User Input: ${query}\nExtracted Tickers: ${extracted.join(", ")}`);
+    } else {
+      setTickers([]);
+      setOutput("No tickers found for your query.");
+    }
+  };
+
+  return (
+    <div className="container mx-auto p-4">
+      <SearchBar onSearch={handleSearch} />
+      <div className="mt-4">
+        <h2>Output:</h2>
+        <pre>{output}</pre>
+        <h2>Extracted Tickers:</h2>
+        {tickers.length > 0 ? (
+          <ul>
+            {tickers.map((ticker) => (
+              <li key={ticker}>{ticker}</li>
+            ))}
+          </ul>
+        ) : (
+          <p>No tickers found</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
+// "use client";
+
+// import { useState } from "react";
+// import SearchBar from "../components/SearchBar";
+// import { extractTickerFromQuery } from "@/utils/extractWithAI";
+
+// export default function Home() {
+//   const [output, setOutput] = useState("");
+//   const [tickers, setTickers] = useState<string[]>([]);
+
+//   const handleSearch = async (query: string, lang: string, region: string) => {
+//     console.log(`Query: ${query}, Language: ${lang}, Region: ${region}`);
+
+//     // 调用 GPT-4o mini API 解析查询，得到 ticker 字符串
+//     const tickerResult = await extractTickerFromQuery(query, region, lang);
+//     console.log("AI extracted result:", tickerResult);
+
+//     // 假设结果中多个 ticker 用逗号分隔
+//     const tickerList = tickerResult.split(",").map(t => t.trim()).filter(Boolean);
+//     setTickers(tickerList);
+//     setOutput(`User Input: ${query}\nExtracted Tickers: ${tickerList.join(", ")}`);
+//   };
+
+//   return (
+//     <div className="container mx-auto p-4">
+//       <SearchBar onSearch={handleSearch} />
+//       <div className="mt-4">
+//         <h2>Output:</h2>
+//         <pre>{output}</pre>
+//         <h2>Extracted Tickers:</h2>
+//         {tickers.length > 0 ? (
+//           <ul>
+//             {tickers.map((ticker) => (
+//               <li key={ticker}>{ticker}</li>
+//             ))}
+//           </ul>
+//         ) : (
+//           <p>No tickers found</p>
+//         )}
+//       </div>
+//     </div>
+//   );
+// }
