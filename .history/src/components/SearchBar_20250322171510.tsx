@@ -19,6 +19,7 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
         onChange={(e) => setQuery(e.target.value)}
       />
 
+      {/* 语言和地区选择 */}
       <div className="mt-4 flex space-x-4">
         <select
           value={language}

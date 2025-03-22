@@ -45,11 +45,11 @@ export default function Home() {
         </p>
         <SearchBar onSearch={handleSearch} />
         <div className="mt-8 border-t pt-4">
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">Input:</h2>
+          <h2 className="text-xl font-semibold text-gray-700 mb-2">Output:</h2>
           <pre className="bg-gray-50 p-4 rounded text-gray-800 whitespace-pre-wrap">
             {output}
           </pre>
-          <h2 className="text-xl font-semibold text-gray-700 mt-6 mb-2">Result:</h2>
+          <h2 className="text-xl font-semibold text-gray-700 mt-6 mb-2">Output Tickers:</h2>
           {tickers.length > 0 ? (
             <ul className="list-disc list-inside text-gray-800">
               {tickers.map((ticker) => (

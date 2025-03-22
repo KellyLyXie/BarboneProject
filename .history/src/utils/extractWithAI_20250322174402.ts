@@ -40,30 +40,57 @@ export async function extractTickerFromQuery(
 //   Language: "${lang}"
 //     `;
 const prompt = `
-        You are an expert financial analyst. Given a natural language query about stocks, extract only the relevant stock ticker(s) that conform to the Financial Modeling Prep (FMP) format. Follow these rules:
-        - If the query mentions a ticker directly (like "AAPL" or "NVDA"), output that ticker.
-        - If the query mentions a company name (for example "Apple" or "Microsoft"), output its ticker ("AAPL" for Apple, "MSFT" for Microsoft).
-        - For dual-listed stocks:
-            * If the user's market is "US", output the US ticker (e.g. "BABA" for Alibaba).
-            * If the user's market is "HK", output the Hong Kong ticker (e.g. "9988.HK" for Alibaba).
-            * If the user's market is "Global", output the ticker with the higher stock price or market cap.
-        - If no stock ticker is found, return "NO_TICKER_FOUND".
-        - Only output the ticker(s) separated by commas, with no extra text.
+You are an expert financial analyst. Given a natural language query about stocks, extract only the relevant stock ticker(s) that conform to the Financial Modeling Prep (FMP) format. Follow these rules:
+    - If the query mentions a ticker directly (like "AAPL" or "NVDA"), output that ticker.
+    - If the query mentions a company name (for example "Apple" or "Microsoft"), output its ticker ("AAPL" for Apple, "MSFT" for Microsoft).
+    - For dual-listed stocks:
+        * If the user's market is "US", output the US ticker (e.g. "BABA" for Alibaba).
+        * If the user's market is "HK", output the Hong Kong ticker (e.g. "9988.HK" for Alibaba).
+        * If the user's market is "Global", output the ticker with the higher stock price or market cap.
+    - If no stock ticker is found, return "NO_TICKER_FOUND".
+    - Only output the ticker(s) separated by commas, with no extra text.
 
-        Examples:
-        Query: "Find me Apple stock price", Market: "US" -> Answer: "AAPL"
-        Query: "compare BABA and NVDA", Market: "Global" -> Answer: "BABA, NVDA"
-        Query: "HSBC", Market: "HK" -> Answer: "0005.HK"
-        Query: "BABA", Market: "US" -> Answer: "BABA"
-        Query: "BABA", Market: "HK" -> Answer: "9988.HK"
-        Query: "Alibaba", Market: "Global" -> Answer: "BABA" (if US ticker has higher price/market cap) or "9988.HK" (if HK ticker has higher price/market cap)
-        Query: "random text with no stock info", Market: "US" -> Answer: "NO_TICKER_FOUND"
+    Examples:
+    1) Query: "Find me Apple stock price", Market: "US"  
+    -> Answer: "AAPL"
 
-        Now, based on the input below, output only the ticker(s):
-        Query: "${query}"
-        Market: "${region}"
-        Language: "${lang}"
+    2) Query: "Compare BABA and NVDA", Market: "Global"  
+    -> Answer: "NVDA"（Assuming NVDA has a higher stock price or market cap）
+
+
+    3) Query: "HSBC", Market: "HK"  
+    -> Answer: "0005.HK"
+
+    4) Query: "BABA", Market: "US"  
+    -> Answer: "BABA"
+
+    5) Query: "BABA", Market: "HK"  
+    -> Answer: "9988.HK"
+
+    6) Query: "random text with no stock info", Market: "US"  
+    -> Answer: "NO_TICKER_FOUND"
+
+    7) Query: "Microsft stock", Market: "US"  
+    (Note the typo "Microsft" instead of "Microsoft")  
+    -> Answer: "MSFT"
+
+    8) Query: "Which is better, AAPL or TSLA?", Market: "Global"  
+    -> Answer: "AAPL, TSLA"
+
+    9) Query: "港股阿里巴巴怎么走", Market: "HK"  
+    (Chinese input indicating Hong Kong listing)  
+    -> Answer: "9988.HK"
+
+    10) Query: "compare 9988.HK and BABA", Market: "Global"  
+        -> Answer: "BABA, 9988.HK"  (Assuming it outputs both tickers in some order)
+    2) Query: "Compare BABA and NVDA", Market: "Global"  
+        -> Answer: "NVDA"（Assuming NVDA has a higher stock price or market cap）
+    Now, based on the input below, output only the ticker(s):
+    Query: "${query}"
+    Market: "${region}"
+    Language: "${lang}"
     `;
+  
     try {
       // for OpenAI API
     //   const response = await fetch('https://api.openai.com/v1/chat/completions', {

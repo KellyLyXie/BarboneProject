@@ -11,6 +11,7 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
 
   return (
     <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
+      {/* 输入框 */}
       <input
         type="text"
         className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -19,6 +20,7 @@ const SearchBar = ({ onSearch }: SearchBarProps) => {
         onChange={(e) => setQuery(e.target.value)}
       />
 
+      {/* 语言和地区选择 */}
       <div className="mt-4 flex space-x-4">
         <select
           value={language}

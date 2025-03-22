@@ -79,8 +79,10 @@ export interface StockItem {
         return [];
       }
     } else {
+      // 如果包含多个单词，则将整个输入作为短语来搜索
       const searchResult = await searchStocks(trimmedQuery, region);
       if (searchResult.length > 0) {
+        // 这里简单地取第一个搜索结果的 ticker
         return [searchResult[0].symbol.toUpperCase()];
       }
       return [];

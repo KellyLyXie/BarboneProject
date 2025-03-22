@@ -39,7 +39,7 @@ export async function extractTickerFromQuery(
 //   Market: "${region}"
 //   Language: "${lang}"
 //     `;
-const prompt = `
+    const prompt = `
         You are an expert financial analyst. Given a natural language query about stocks, extract only the relevant stock ticker(s) that conform to the Financial Modeling Prep (FMP) format. Follow these rules:
         - If the query mentions a ticker directly (like "AAPL" or "NVDA"), output that ticker.
         - If the query mentions a company name (for example "Apple" or "Microsoft"), output its ticker ("AAPL" for Apple, "MSFT" for Microsoft).
@@ -58,12 +58,13 @@ const prompt = `
         Query: "BABA", Market: "HK" -> Answer: "9988.HK"
         Query: "Alibaba", Market: "Global" -> Answer: "BABA" (if US ticker has higher price/market cap) or "9988.HK" (if HK ticker has higher price/market cap)
         Query: "random text with no stock info", Market: "US" -> Answer: "NO_TICKER_FOUND"
-
+        Query: "Help me find the price of a stock (The user will give you the name of that stock)", Market: "Global" -> Answer: List all stocks and rank by the price.
         Now, based on the input below, output only the ticker(s):
         Query: "${query}"
         Market: "${region}"
         Language: "${lang}"
     `;
+  
     try {
       // for OpenAI API
     //   const response = await fetch('https://api.openai.com/v1/chat/completions', {

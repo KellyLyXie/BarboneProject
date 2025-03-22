@@ -81,6 +81,7 @@ export interface StockItem {
     } else {
       const searchResult = await searchStocks(trimmedQuery, region);
       if (searchResult.length > 0) {
+        // 这里简单地取第一个搜索结果的 ticker
         return [searchResult[0].symbol.toUpperCase()];
       }
       return [];

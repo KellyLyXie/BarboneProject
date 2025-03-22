@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import SearchBar from "../components/SearchBar";
-import { extractTickerFromQuery } from "@/utils/extractWithAI"; 
+import { extractTickerFromQuery } from "@/utils/extractWithAI"; // 使用 DeepSeek AI 模型
 import { extractTicker } from "@/utils/ticker";
 
 export default function Home() {
@@ -20,8 +20,11 @@ export default function Home() {
       setOutput("No tickers found");
       return;
     }
+
+    // 拆分返回结果（多个 ticker 用逗号分隔）
     const tickerList = tickerResult.split(",").map(t => t.trim()).filter(Boolean);
 
+    // 使用原有严格匹配逻辑进一步验证并提取 ticker（可选）
     const validatedTickers = await Promise.all(
       tickerList.map(async (ticker) => {
         const result = await extractTicker(ticker, region);
@@ -45,11 +48,11 @@ export default function Home() {
         </p>
         <SearchBar onSearch={handleSearch} />
         <div className="mt-8 border-t pt-4">
-          <h2 className="text-xl font-semibold text-gray-700 mb-2">Input:</h2>
+          <h2 className="text-xl font-semibold text-gray-700 mb-2">Output:</h2>
           <pre className="bg-gray-50 p-4 rounded text-gray-800 whitespace-pre-wrap">
             {output}
           </pre>
-          <h2 className="text-xl font-semibold text-gray-700 mt-6 mb-2">Result:</h2>
+          <h2 className="text-xl font-semibold text-gray-700 mt-6 mb-2">Extracted Tickers:</h2>
           {tickers.length > 0 ? (
             <ul className="list-disc list-inside text-gray-800">
               {tickers.map((ticker) => (

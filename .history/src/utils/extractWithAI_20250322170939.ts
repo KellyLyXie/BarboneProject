@@ -14,6 +14,7 @@ export async function extractTickerFromQuery(
     region: string,
     lang: string
   ): Promise<string> {
+    // 构造英文 prompt
 //     const prompt = `
 //   You are an expert financial analyst. Given a natural language query about stocks, extract only the relevant stock ticker(s) that conform to the Financial Modeling Prep (FMP) format. Follow these rules:
 //   - If the query mentions a ticker directly (like "AAPL" or "NVDA"), output that ticker.
@@ -39,7 +40,7 @@ export async function extractTickerFromQuery(
 //   Market: "${region}"
 //   Language: "${lang}"
 //     `;
-const prompt = `
+    const prompt = `
         You are an expert financial analyst. Given a natural language query about stocks, extract only the relevant stock ticker(s) that conform to the Financial Modeling Prep (FMP) format. Follow these rules:
         - If the query mentions a ticker directly (like "AAPL" or "NVDA"), output that ticker.
         - If the query mentions a company name (for example "Apple" or "Microsoft"), output its ticker ("AAPL" for Apple, "MSFT" for Microsoft).
@@ -64,6 +65,7 @@ const prompt = `
         Market: "${region}"
         Language: "${lang}"
     `;
+  
     try {
       // for OpenAI API
     //   const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -77,7 +79,7 @@ const prompt = `
     //       messages: [{ role: "user", content: prompt }],
     //       temperature: 0.1,
     //       max_tokens: 50,
-    //       response_format: { type: "text" }
+    //       response_format: { type: "text" } // 强制返回纯文本
     //     })
     //   });
         const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
@@ -87,22 +89,24 @@ const prompt = `
             'Authorization': `Bearer ${process.env.NEXT_PUBLIC_DEEPSEEK_API_KEY}`, 
             },
             body: JSON.stringify({
-            model: "deepseek-chat", // deepseek model
+            model: "deepseek-chat", // 替换为实际模型名称
             messages: [{ role: "user", content: prompt }],
             temperature: 0.1,
             max_tokens: 50,
             })
         });
   
+      // 检查响应状态
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(`API Error: ${errorData.error?.message}`);
       }
   
-      // parse the response
+      // 解析响应数据
       const data = await response.json();
       let result = data.choices[0]?.message?.content?.trim() || "";
   
+      // 安全过滤
       result = result.replace(/[^A-Z0-9\.,]/g, '');
   
       return result;

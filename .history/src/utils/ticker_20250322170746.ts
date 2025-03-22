@@ -5,7 +5,7 @@ export interface StockItem {
     exchange?: string;
   }
   
-  // Get all stock tickers from the API FMP
+  // Get all stock tickers from the API FM
   export async function fetchTickers(): Promise<Set<string>> {
     const apiKey = process.env.NEXT_PUBLIC_FMP_API_KEY;
     const response = await fetch(`https://financialmodelingprep.com/api/v3/stock/list?apikey=${apiKey}`);
@@ -25,11 +25,11 @@ export interface StockItem {
     return new Set(symbols);
   }
   
-  // search for stocks by query
+  // 搜索股票
   export async function searchStocks(query: string, region: string = "US"): Promise<StockItem[]> {
     const apiKey = process.env.NEXT_PUBLIC_FMP_API_KEY;
     let exchangeParam = "";
-
+  
     if (region === "US") {
       exchangeParam = "&exchange=NASDAQ";
     } else if (region === "HK") {
@@ -59,19 +59,20 @@ export interface StockItem {
   }
 
   export async function extractTicker(query: string, region: string = "US"): Promise<string[]> {
-    // processing the input string 
+    // 去掉两边空格
     const trimmedQuery = query.trim();
     if (!trimmedQuery) return [];
   
-    // if the query is a single word
+    // 如果输入中没有空格，则认为是单个单词
     if (!trimmedQuery.includes(" ")) {
-      // fetch all tickers
+      // 先尝试严格匹配：获取所有股票代码集合
       const tickersSet = await fetchTickers();
       const upperQuery = trimmedQuery.toUpperCase();
       if (tickersSet.has(upperQuery)) {
+        // 如果直接匹配到了，就返回该 ticker
         return [upperQuery];
       } else {
-        // search
+        // 否则调用搜索接口
         const searchResult = await searchStocks(trimmedQuery, region);
         if (searchResult.length > 0) {
           return [searchResult[0].symbol.toUpperCase()];
@@ -79,8 +80,10 @@ export interface StockItem {
         return [];
       }
     } else {
+      // 如果包含多个单词，则将整个输入作为短语来搜索
       const searchResult = await searchStocks(trimmedQuery, region);
       if (searchResult.length > 0) {
+        // 这里简单地取第一个搜索结果的 ticker
         return [searchResult[0].symbol.toUpperCase()];
       }
       return [];
