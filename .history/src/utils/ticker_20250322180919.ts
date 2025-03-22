@@ -62,7 +62,7 @@ export interface FMPStock {
     return stocks;
   }
   
-
+  // 提取股票代码函数，根据用户输入和区域返回一个 ticker 数组
   export async function extractTicker(query: string, region: string = "US"): Promise<string[]> {
     const trimmedQuery = query.trim();
     if (!trimmedQuery) return [];

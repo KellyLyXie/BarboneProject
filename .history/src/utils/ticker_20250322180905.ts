@@ -7,7 +7,7 @@ export interface FMPStock {
     exchange?: string;
   }
   
-
+  // 获取所有股票代码，返回 FMPStock 数组中 symbol 的集合
   export async function fetchTickers(): Promise<Set<string>> {
     const apiKey = process.env.NEXT_PUBLIC_FMP_API_KEY;
     const response = await fetch(`https://financialmodelingprep.com/api/v3/stock/list?apikey=${apiKey}`);
@@ -25,20 +25,20 @@ export interface FMPStock {
       return new Set();
     }
   
-
+    // 类型断言 data 为 FMPStock 数组
     const stocks = data as FMPStock[];
   
-
+    // 将 symbol 转为大写后存入 Set
     const symbols = stocks.map((item) => item.symbol.toUpperCase());
     return new Set(symbols);
   }
   
-
+  // 搜索股票函数，根据查询字符串和区域返回 FMPStock 数组
   export async function searchStocks(query: string, region: string = "US"): Promise<FMPStock[]> {
     const apiKey = process.env.NEXT_PUBLIC_FMP_API_KEY;
     let exchangeParam = "";
     if (region === "US") {
-      exchangeParam = "&exchange=NASDAQ"; 
+      exchangeParam = "&exchange=NASDAQ"; // 可根据需要调整
     } else if (region === "HK") {
       exchangeParam = "&exchange=HKEX";
     } else if (region === "CN") {
@@ -57,12 +57,12 @@ export interface FMPStock {
       console.error("FMP Search API returned non-array:", data);
       return [];
     }
-
+    // 类型断言 data 为 FMPStock 数组
     const stocks = data as FMPStock[];
     return stocks;
   }
   
-
+  // 提取股票代码函数，根据用户输入和区域返回一个 ticker 数组
   export async function extractTicker(query: string, region: string = "US"): Promise<string[]> {
     const trimmedQuery = query.trim();
     if (!trimmedQuery) return [];
