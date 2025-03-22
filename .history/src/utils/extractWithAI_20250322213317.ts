@@ -15,7 +15,6 @@ export async function extractTickerFromQuery(
     region: string,
     lang: string
   ): Promise<string> {
-    // Cache
     const cacheKey = `${query.trim().toLowerCase()}_${region}_${lang}`;
     if (aiResponseCache[cacheKey]) {
         console.log("Using cached AI response for:", cacheKey);

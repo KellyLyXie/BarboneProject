@@ -15,7 +15,6 @@ export async function extractTickerFromQuery(
     region: string,
     lang: string
   ): Promise<string> {
-    // Cache
     const cacheKey = `${query.trim().toLowerCase()}_${region}_${lang}`;
     if (aiResponseCache[cacheKey]) {
         console.log("Using cached AI response for:", cacheKey);
@@ -49,6 +48,21 @@ export async function extractTickerFromQuery(
         Language: "${lang}"
     `;
     try {
+      // for OpenAI API
+    //   const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //       'Authorization': `Bearer ${process.env.NEXT_PUBLIC_OPENAI_API_KEY}`,
+    //     },
+    //     body: JSON.stringify({
+    //       model: "gpt-4o", // 或 gpt-4-turbo
+    //       messages: [{ role: "user", content: prompt }],
+    //       temperature: 0.1,
+    //       max_tokens: 50,
+    //       response_format: { type: "text" }
+    //     })
+    //   });
         const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
             method: 'POST',
             headers: {
@@ -73,8 +87,7 @@ export async function extractTickerFromQuery(
       let result = data.choices[0]?.message?.content?.trim() || "";
   
       result = result.replace(/[^A-Z0-9\.,]/g, '');
-      // cache the result
-      aiResponseCache[cacheKey] = result;
+  
       return result;
     } catch (error) {
       console.error('GPT API Error:', error);

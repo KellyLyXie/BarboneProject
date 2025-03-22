@@ -6,7 +6,6 @@
     name?: string;
     exchange?: string;
   }
-  // Cached tickers
   let cachedTickers: Set<string> | null = null;
 
   export async function fetchTickers(): Promise<Set<string>> {
@@ -34,10 +33,7 @@
   
 
     const symbols = stocks.map((item) => item.symbol.toUpperCase());
-    cachedTickers = new Set(symbols);
-    console.log("Tickers fetched and cached.");
-    // return new Set(symbols);
-    return cachedTickers;
+    return new Set(symbols);
   }
   
 

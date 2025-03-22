@@ -6,20 +6,15 @@
     name?: string;
     exchange?: string;
   }
-  // Cached tickers
   let cachedTickers: Set<string> | null = null;
 
   export async function fetchTickers(): Promise<Set<string>> {
-    if (cachedTickers) {
-        console.log("Using cached tickers.");
-        return cachedTickers;
-    }
     const apiKey = process.env.NEXT_PUBLIC_FMP_API_KEY;
     const response = await fetch(`https://financialmodelingprep.com/api/v3/stock/list?apikey=${apiKey}`);
   
     if (!response.ok) {
-        console.error("FMP API Error:", response.status, response.statusText);
-        return new Set();
+      console.error("FMP API Error:", response.status, response.statusText);
+      return new Set();
     }
   
     const data: unknown = await response.json();
@@ -34,10 +29,7 @@
   
 
     const symbols = stocks.map((item) => item.symbol.toUpperCase());
-    cachedTickers = new Set(symbols);
-    console.log("Tickers fetched and cached.");
-    // return new Set(symbols);
-    return cachedTickers;
+    return new Set(symbols);
   }
   
 

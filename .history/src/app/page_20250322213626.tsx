@@ -28,6 +28,14 @@ export default function Home() {
         return result.length > 0 ? result[0] : null;
       })
     );
+    const validatedTickers = await Promise.all(
+      tickerList.map(async (ticker) => {
+        // 在 extractTicker 中可以内部调用 fetchTickers()，但如果有缓存，你可以直接使用 tickersCache
+        // 这里我们直接调用 extractTicker，不用修改 extractTicker 本身
+        const result = await extractTicker(ticker, region);
+        return result.length > 0 ? result[0] : null;
+      })
+    );
     const finalTickers = validatedTickers.filter(Boolean) as string[];
     setTickers(finalTickers);
     setOutput(`User Input: ${query}\nExtracted Tickers: ${finalTickers.join(", ")}`);

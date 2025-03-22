@@ -6,7 +6,7 @@
     name?: string;
     exchange?: string;
   }
-  // Cached tickers
+  // 
   let cachedTickers: Set<string> | null = null;
 
   export async function fetchTickers(): Promise<Set<string>> {

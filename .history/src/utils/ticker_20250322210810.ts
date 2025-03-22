@@ -1,25 +1,24 @@
 // src/utils/ticker.ts
 
 
-  export interface FMPStock {
+export interface FMPStock {
     symbol: string;
     name?: string;
     exchange?: string;
   }
-  // Cached tickers
+  // Cached ticker symbols
   let cachedTickers: Set<string> | null = null;
 
   export async function fetchTickers(): Promise<Set<string>> {
     if (cachedTickers) {
-        console.log("Using cached tickers.");
         return cachedTickers;
     }
     const apiKey = process.env.NEXT_PUBLIC_FMP_API_KEY;
     const response = await fetch(`https://financialmodelingprep.com/api/v3/stock/list?apikey=${apiKey}`);
   
     if (!response.ok) {
-        console.error("FMP API Error:", response.status, response.statusText);
-        return new Set();
+      console.error("FMP API Error:", response.status, response.statusText);
+      return new Set();
     }
   
     const data: unknown = await response.json();
@@ -31,11 +30,9 @@
   
 
     const stocks = data as FMPStock[];
-  
-
     const symbols = stocks.map((item) => item.symbol.toUpperCase());
-    cachedTickers = new Set(symbols);
-    console.log("Tickers fetched and cached.");
+
+    cachedTickers = new Set(symbols); 
     // return new Set(symbols);
     return cachedTickers;
   }

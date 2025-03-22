@@ -9,16 +9,17 @@
  * @returns 
  * 
  */
+
+// Cache for AI responses
 const aiResponseCache: { [key: string]: string } = {};
 export async function extractTickerFromQuery(
     query: string,
     region: string,
     lang: string
   ): Promise<string> {
-    // Cache
     const cacheKey = `${query.trim().toLowerCase()}_${region}_${lang}`;
     if (aiResponseCache[cacheKey]) {
-        console.log("Using cached AI response for:", cacheKey);
+        console.log("Using cached AI response");
         return aiResponseCache[cacheKey];
     }
     const prompt = `
@@ -73,8 +74,6 @@ export async function extractTickerFromQuery(
       let result = data.choices[0]?.message?.content?.trim() || "";
   
       result = result.replace(/[^A-Z0-9\.,]/g, '');
-      // cache the result
-      aiResponseCache[cacheKey] = result;
       return result;
     } catch (error) {
       console.error('GPT API Error:', error);
